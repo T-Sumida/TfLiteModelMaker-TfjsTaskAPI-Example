@@ -1,0 +1,161 @@
+<html>
+
+<head>
+    <meta http-qeuiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Tflite Object-Detector Web API Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/tasks@0.0.1-alpha.8"></script>
+    <script src="//code.jquery.com/jquery-2.2.3.min.js"></script>
+    <link rel="stylesheet" href="static/js/style.css">
+</head>
+
+<body>
+    <h1>Tflite Object-Detector Web API Example</h1>
+
+    <p>バックエンドに作ったTf-LiteのObject Detection APIを行うサンプルです。</p>
+    
+    <!-- ファイル選択ボタン -->
+    <div style="width: 500px">
+        <form enctype="multipart/form-data" method="post">
+            <input type="file" name="userfile" accept="image/*">
+        </form>
+    </div>
+
+    <!-- 画像表示領域 -->
+    <canvas id="canvas" width="0" height="0"></canvas>
+
+    <!-- アップロード開始ボタン -->
+    <button class="btn btn-primary" id="post">POST</button>
+
+    <br>
+    <h2 id="result"></h2>
+
+    <script>
+
+        var model = false;
+
+
+        // 画像をリサイズして、HTMLで表示する
+        $(function () {
+            var file = null;
+            var blob = null;
+
+            $("input[type=file]").change(function () {
+                file = $(this).prop("files")[0];
+
+                // ファイルチェック
+                if (file.type != "image/jpeg" && file.type != "image/png") {
+                    file = null;
+                    blob = null;
+                    return;
+                }
+
+
+                // 画像をリサイズする
+                var image = new Image();
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    image.onload = function () {
+                        var width, height;
+
+                        width = image.width;
+                        height = image.height;
+
+                        var canvas = $("#canvas").attr("width", width).attr("height", height);
+                        var ctx = canvas[0].getContext("2d");
+                        ctx.clearRect(0, 0, width, height);
+                        ctx.drawImage(
+                            image,
+                            0,
+                            0,
+                            image.width,
+                            image.height,
+                            0,
+                            0,
+                            width,
+                            height
+                        );
+
+                        // canvasからbase64画像データを取得し、POST用のBlobを作成する
+                        var base64 = canvas.get(0).toDataURL("image/jpeg");
+                        var barr, bin, i, len;
+                        bin = atob(base64.split("base64,")[1]);
+                        len = bin.length;
+                        barr = new Uint8Array(len);
+                        i = 0;
+                        while (i < len) {
+                            barr[i] = bin.charCodeAt(i);
+                            i++;
+                        }
+                        blob = new Blob([barr], { type: "image/jpeg" });
+                    };
+                    image.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            // アップロード開始ボタンがクリックされたら
+            $("#post").click(function () {
+                console.log("post")
+                if (!file || !blob) {
+                    return;
+                }
+
+                var name,
+                    fd = new FormData();
+                fd.append("files", blob);
+
+                // API宛にPOSTする
+                $.ajax({
+                    url: "/api/predict",
+                    type: "POST",
+                    dataType: "json",
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    headers: { "token": "example" },
+                })
+                    .done(function (data, textStatus, jqXHR) {
+                        // 通信が成功した場合、結果を出力する
+                        var response = JSON.stringify(data);
+                        var response = JSON.parse(response);
+                        draw_bbox(response['bboxes'], response['scores'], response['classes'])
+                    })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                        // 通信が失敗した場合、エラーメッセージを出力する
+                        var result = document.getElementById("result");
+                        result.innerHTML = "サーバーとの通信が失敗した...";
+                    });
+            });
+        });
+
+        function draw_bbox(bboxes, scores, classes) {
+            for (let n = 0; n < bboxes.length; n++) {
+                if (scores[n] > 0.6) {
+                    var context = canvas.getContext('2d');
+                    //ここに具体的な描画内容を指定する
+                    //新しいパスを開始する
+
+                    var width = bboxes[n][2] - bboxes[n][0]
+                    var height = bboxes[n][3] - bboxes[n][1]
+                    context.beginPath();
+                    var text = classes[n] + ' - with '
+                        + Math.round(parseFloat(scores[n]) * 100)
+                        + '% confidence.';
+                    context.fillStyle = "rgb(255, 165, 0)";
+                    context.globalAlpha = 1.0;
+                    context.fillRect(bboxes[n][0], bboxes[n][1] - 20, width, 20);
+                    context.fillStyle = "rgb(255, 255, 255)";
+                    context.fillText(text, bboxes[n][0] + 5, bboxes[n][1] - 5);
+                    context.fillStyle = "rgb(0, 255, 0)";
+                    context.globalAlpha = 0.3;
+                    context.fillRect(bboxes[n][0], bboxes[n][1], width, height);
+                    context.stroke();
+                }
+            }
+        }
+
+        const canvas = document.getElementById('canvas');
+
+    </script>
+</body>
+
+</html>

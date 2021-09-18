@@ -1,0 +1,119 @@
+<html>
+
+<head>
+  <meta http-qeuiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Tf-lite Object-Detector TFJS Task API Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/tasks@0.0.1-alpha.8"></script>
+  <script src="//code.jquery.com/jquery-2.2.3.min.js"></script>
+  <link rel="stylesheet" href="static/js/style.css">
+</head>
+
+<body>
+  <h1>Tf-lite Object-Detector TFJS Task API Example</h1>
+
+  <p>TFJS Task APIを使ってフロントエンド側でObject Detectionを行うサンプルです。</p>
+  <!-- ファイル選択ボタン -->
+  <div style="width: 500px">
+    <form enctype="multipart/form-data" method="post">
+      <input type="file" name="userfile" accept="image/*">
+    </form>
+  </div>
+
+  <!-- 画像表示領域 -->
+  <canvas id="canvas" width="0" height="0"></canvas>
+
+
+
+  <script>
+
+    var model = false;
+
+
+    // 画像をリサイズして、HTMLで表示する
+    $(function () {
+      var file = null;
+
+      $("input[type=file]").change(function () {
+        file = $(this).prop("files")[0];
+
+        // ファイルチェック
+        if (file.type != "image/jpeg" && file.type != "image/png") {
+          file = null;
+          return;
+        }
+
+
+        // 画像をリサイズする
+        var image = new Image();
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          image.onload = function () {
+            var width, height;
+
+            width = image.width;
+            height = image.height;
+
+            var canvas = $("#canvas").attr("width", width).attr("height", height);
+            var ctx = canvas[0].getContext("2d");
+            ctx.clearRect(0, 0, width, height);
+            ctx.drawImage(
+              image,
+              0,
+              0,
+              image.width,
+              image.height,
+              0,
+              0,
+              width,
+              height
+            );
+
+            run();
+          };
+          image.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+
+    async function load_model() {
+      if (model == false) {
+        model = await tfTask.ObjectDetection.CustomModel.TFLite.load({
+          model: "./static/model_fp16.tflite",
+        });
+      }
+    }
+    const canvas = document.getElementById('canvas');
+    async function run() {
+      const img = document.querySelector('canvas');
+      const result = await model.predict(img);
+
+      for (let n = 0; n < result.objects.length; n++) {
+        if (result.objects[n].score > 0.6) {
+          console.log(result.objects[n])
+          var context = canvas.getContext('2d');
+          //ここに具体的な描画内容を指定する
+          //新しいパスを開始する
+          context.beginPath();
+          var text = result.objects[n].className + ' - with '
+            + Math.round(parseFloat(result.objects[n].score) * 100)
+            + '% confidence.';
+          context.fillStyle = "rgb(255, 165, 0)";
+          context.globalAlpha = 1.0;
+          context.fillRect(result.objects[n].boundingBox.originX, result.objects[n].boundingBox.originY - 20, result.objects[n].boundingBox.width, 20);
+          context.fillStyle = "rgb(255, 255, 255)";
+          context.fillText(text, result.objects[n].boundingBox.originX + 5, result.objects[n].boundingBox.originY - 5);
+          context.fillStyle = "rgb(0, 255, 0)";
+          context.globalAlpha = 0.3;
+          context.fillRect(result.objects[n].boundingBox.originX, result.objects[n].boundingBox.originY, result.objects[n].boundingBox.width, result.objects[n].boundingBox.height);
+          context.stroke();
+
+        }
+      }
+    }
+    load_model();
+  </script>
+</body>
+
+</html>
