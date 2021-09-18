@@ -1,3 +1,14 @@
+/dataset
+/Sheeps-PascalVOC-export
+/trainer/mlruns
+/trainer/data/01_raw/*/*.jpg
+/trainer/data/01_raw/*/*.png
+/trainer/data/01_raw/target_images/*/*.png
+/trainer/data/04_report/*.jpg
+*.pkl
+*.csv
+*.tflite
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
