@@ -1,0 +1,8 @@
+Cython==0.29.24
+h5py==3.1.0
+luigi==3.0.3
+opencv-python==4.2.0.34
+tflite-model-maker==0.3.2
+tensorflow==2.5.0
+mlflow
+luigi
