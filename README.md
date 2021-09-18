@@ -12,6 +12,9 @@ Tensorflow Lite Model Makerで作成した物体検出モデルを、Tensorflow.
 |webcamからの画像に対してフロントエンドで推論| ![](./docs/webcam_front.png)|
 |画像アップロードに対してバックエンドで推論| ![](./docs/post_webapi.png)|
 
+
+[![youtube](http://img.youtube.com/vi/U8f_jOCZtfg/0.jpg)](https://www.youtube.com/watch?v=U8f_jOCZtfg)
+
 # Environment
 
 - Windows 10 home
