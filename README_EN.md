@@ -15,7 +15,7 @@ In the browser demo, we have the following three features available.
 |Backend inference for image uploads | ![](./docs/post_webapi.png)|
 
 
-**webcam機能のデモ映像**
+**Demonstration video of the webcam function**
 
 [![youtube](http://img.youtube.com/vi/U8f_jOCZtfg/0.jpg)](https://www.youtube.com/watch?v=U8f_jOCZtfg)
 
