@@ -161,5 +161,5 @@ In the browser demo, we have the following three features available.
 
 T-Sumida（[https://twitter.com/sumita_v09](https://twitter.com/sumita_v09)）
 
-# Licence
+# License
 tflite-model-maker-example is under MIT License.
