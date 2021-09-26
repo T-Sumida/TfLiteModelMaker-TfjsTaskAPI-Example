@@ -1,6 +1,6 @@
 [[Japanese](./README_EN.md)/English]
 
-# tflite-model-maker-example
+# TfLiteModelMaker-TfjsTaskAPI-Example
 # Overview
 This is a series of demolition repositories that perform browser-side inference on object detection models created with Tensorflow Lite Model Maker using the Tensorflow.js Task API.
 
