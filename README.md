@@ -1,6 +1,6 @@
 [Japanese/[English](./README_EN.md)]
 
-# tflite-model-maker-example
+# TfLiteModelMaker-TfjsTaskAPI-Example
 # Overview
 Tensorflow Lite Model Makerで作成した物体検出モデルを、Tensorflow.js Task APIを使ってブラウザ側で推論を行う一連のデモリポジトリです。
 
