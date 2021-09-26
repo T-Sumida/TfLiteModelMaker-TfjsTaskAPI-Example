@@ -165,5 +165,5 @@ Tensorflow Lite Model Makerで作成した物体検出モデルを、Tensorflow.
 
 T-Sumida（[https://twitter.com/sumita_v09](https://twitter.com/sumita_v09)）
 
-# Licence
+# License
 tflite-model-maker-example is under MIT License.
